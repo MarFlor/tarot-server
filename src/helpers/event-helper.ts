@@ -58,7 +58,7 @@ const SetNickToSockets = async (io : any, connNicks : ClientSocketDetails[]) : P
 }
 
 const RandomNickName = () : string => {
-    const nicks : Array<string> = ['Luna', 'Fobos', 'Haumea', 'Ariel', 'Titania', 'Deimos', 'Tritón', 'Miranda', 'Jápeto', 'Urano', 'Europa', 'Ganymede', 'Callisto', 'Amaltea', 'Himalia', 'Elara', 'Pasiphae', 'Sinope', 'Lysithea', 'Carme', 'Ananke' ]
+    const nicks : Array<string> = ['Delphinus', 'Serpens', 'Titawin', 'Toliman', 'Rosalíadecastro', 'Rastaban', 'Rasalas', 'Tureis', 'Xamidimura', 'Yed Posterior', 'Zosma', 'Alkarab', 'Alnasl', 'Fomalhaut', 'Fobos', 'Haumea', 'Ariel', 'Titania', 'Deimos', 'Tritón', 'Miranda', 'Jápeto', 'Urano', 'Europa', 'Ganymede', 'Callisto', 'Amaltea', 'Himalia', 'Elara', 'Pasiphae', 'Sinope', 'Lysithea', 'Carme', 'Ananke' ]
     const random = Math.floor(Math.random() * nicks.length);
     return nicks[random];
 }

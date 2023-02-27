@@ -62,7 +62,6 @@ io.on("connection", async function(socket: any) {
 
     const roomDetails = availRooms.find(o => o.roomName == roomName);
     io.to(roomName).emit('enteredRoomDetails', roomDetails);
-    io.to(roomName).emit('toRoomMessage', "Espera un momento estamos en " + roomName);
 
   });
 
