@@ -1,4 +1,7 @@
 import { RoomDetails } from "../types/tarot-card";
+import fs from 'fs';
+
+const allNicks = JSON.parse(fs.readFileSync('src/files/nicks.json').toString('utf-8'));
 
 const GetAllRooms = (io: any, connNicks : Array<ClientSocketDetails>) : Promise<RoomDetails[]> => {
 
@@ -36,31 +39,53 @@ const GetAllRooms = (io: any, connNicks : Array<ClientSocketDetails>) : Promise<
 const SetNickToSockets = async (io : any, connNicks : ClientSocketDetails[]) : Promise<ClientSocketDetails[]> => {
   
     const sockets = (await io.fetchSockets()).map((socket : any) => socket.id);
-  
+
+    console.log("sockets", sockets);
+
+    //add new sockets
     sockets.map((item : string) => {
-  
+
       if(!connNicks.find(o => o.id == item))
       {
-        connNicks.push({ id :item, nick : RandomNickName() })
+        const avatar = RandomAvatar();
+        connNicks.push({ id :item, nick : RandomNickName(), avatar : avatar })
       }
+
     });
-  
+    
+    //remove disconnected sockets
     connNicks.map((item, index) => {
-  
+
       if(!sockets.find((o: string) => o == item.id))
       {
         connNicks.splice(index)
       }
     })
-  
+
     console.log("connNicks", connNicks)
     return Promise.resolve(connNicks)
 }
 
 const RandomNickName = () : string => {
-    const nicks : Array<string> = ['Delphinus', 'Serpens', 'Titawin', 'Toliman', 'Rosalíadecastro', 'Rastaban', 'Rasalas', 'Tureis', 'Xamidimura', 'Yed Posterior', 'Zosma', 'Alkarab', 'Alnasl', 'Fomalhaut', 'Fobos', 'Haumea', 'Ariel', 'Titania', 'Deimos', 'Tritón', 'Miranda', 'Jápeto', 'Urano', 'Europa', 'Ganymede', 'Callisto', 'Amaltea', 'Himalia', 'Elara', 'Pasiphae', 'Sinope', 'Lysithea', 'Carme', 'Ananke' ]
-    const random = Math.floor(Math.random() * nicks.length);
-    return nicks[random];
+    const random = Math.floor(Math.random() * allNicks.length);
+    return allNicks[random];
+}
+
+const RandomAvatar = () : string => {
+  const avatars : Array<string> = 
+  [
+    'https://react.semantic-ui.com/images/avatar/large/jenny.jpg', 
+    'https://semantic-ui.com/images/avatar/large/daniel.jpg', 
+    'https://semantic-ui.com/images/avatar/large/helen.jpg', 
+    'https://react.semantic-ui.com/images/avatar/large/matthew.png', 
+    'https://react.semantic-ui.com/images/avatar/large/molly.png', 
+    'https://react.semantic-ui.com/images/avatar/large/elliot.jpg'
+  ]
+  const random = Math.floor(Math.random() * avatars.length);
+
+  console.log("avatars[random]", avatars[random])
+
+  return avatars[random].toString();
 }
 
 export {GetAllRooms, SetNickToSockets, RandomNickName}

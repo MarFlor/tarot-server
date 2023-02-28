@@ -20,4 +20,5 @@ interface SocketData {
 interface ClientSocketDetails {
   id : string;
   nick : string;
+  avatar: string;
 }

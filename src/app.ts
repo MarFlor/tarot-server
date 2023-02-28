@@ -26,6 +26,7 @@ const allCards : TarotCard[] = JSON.parse(rawdata.toString('utf-8'));
 
 io.on("connection", async function(socket: any) {
   
+  //return all avaible connections with nick and avatar
   connNicks = await SetNickToSockets(io, connNicks)
 
   const temp = connNicks.find(o => o.id == socket.id)
@@ -35,7 +36,7 @@ io.on("connection", async function(socket: any) {
   socket.on("enter-room", async function(roomName: string) {
     
     await socket.join(roomName);
-    
+
     availRooms = await GetAllRooms(io, connNicks)
 
     const roomDetails = availRooms.find(o => o.roomName == roomName);
