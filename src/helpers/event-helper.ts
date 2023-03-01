@@ -5,7 +5,10 @@ const allNicks = JSON.parse(fs.readFileSync('src/files/nicks.json').toString('ut
 
 const GetAllRooms = (io: any, connNicks : Array<ClientSocketDetails>) : Promise<RoomDetails[]> => {
 
-    // https://simplernerd.com/js-socketio-active-rooms/
+  console.log("GetAllRooms connNicks", JSON.stringify(connNicks))
+  console.log("------------")
+  
+  // https://simplernerd.com/js-socketio-active-rooms/
     const arr = Array.from(io.sockets.adapter.rooms)
     
     // Filter rooms whose name exist in set:
@@ -13,7 +16,7 @@ const GetAllRooms = (io: any, connNicks : Array<ClientSocketDetails>) : Promise<
   
     let roomsTemp = new Array<RoomDetails>();
   
-    // Return only the room name:
+    // Return clients in the room name:
     for (let oneRoom of filtered.map(i => i[0])) 
     { 
       let clients : Array<ClientSocketDetails> = new Array<ClientSocketDetails>();
@@ -30,9 +33,12 @@ const GetAllRooms = (io: any, connNicks : Array<ClientSocketDetails>) : Promise<
       
       let room : RoomDetails = { roomName : oneRoom, roomId : oneRoom, clients : clients };
       roomsTemp.push(room);
+      console.log("GetAllRooms clients roomsTemp.push", JSON.stringify(clients))
+      console.log("------------")
     }
+    
   
-    console.log("GetAllRooms", roomsTemp)
+    //console.log("GetAllRooms", JSON.stringify(roomsTemp))
     return Promise.resolve(roomsTemp)
 }
 
@@ -62,7 +68,7 @@ const SetNickToSockets = async (io : any, connNicks : ClientSocketDetails[]) : P
       }
     })
 
-    console.log("connNicks", connNicks)
+    //console.log("connNicks", connNicks)
     return Promise.resolve(connNicks)
 }
 
@@ -79,11 +85,18 @@ const RandomAvatar = () : string => {
     'https://semantic-ui.com/images/avatar/large/helen.jpg', 
     'https://react.semantic-ui.com/images/avatar/large/matthew.png', 
     'https://react.semantic-ui.com/images/avatar/large/molly.png', 
-    'https://react.semantic-ui.com/images/avatar/large/elliot.jpg'
+    'https://react.semantic-ui.com/images/avatar/large/elliot.jpg',
+    'https://semantic-ui.com/images/avatar2/large/rachel.png',
+    'https://semantic-ui.com/images/avatar2/large/lindsay.png',
+    'https://semantic-ui.com/images/avatar/large/veronika.jpg',
+    'https://semantic-ui.com/images/avatar/large/stevie.jpg',
+    'https://semantic-ui.com/images/avatar/large/christian.jpg',
+    'https://semantic-ui.com/images/avatar/large/tom.jpg',
+    'https://semantic-ui.com/images/avatar2/large/lena.png',
+    'https://semantic-ui.com/images/avatar2/large/mark.png'
+
   ]
   const random = Math.floor(Math.random() * avatars.length);
-
-  console.log("avatars[random]", avatars[random])
 
   return avatars[random].toString();
 }

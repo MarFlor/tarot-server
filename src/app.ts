@@ -26,6 +26,8 @@ const allCards : TarotCard[] = JSON.parse(rawdata.toString('utf-8'));
 
 io.on("connection", async function(socket: any) {
   
+  console.log("connection > ", socket.id); 
+  
   //return all avaible connections with nick and avatar
   connNicks = await SetNickToSockets(io, connNicks)
 
@@ -35,6 +37,8 @@ io.on("connection", async function(socket: any) {
   // whenever we receive a 'message' we log it out
   socket.on("enter-room", async function(roomName: string) {
     
+    console.log("enter-room > ", roomName + " --- " + socket.id); 
+
     await socket.join(roomName);
 
     availRooms = await GetAllRooms(io, connNicks)
@@ -50,7 +54,7 @@ io.on("connection", async function(socket: any) {
       let reading : RoomCardReading = { roomName : roomName, roomId : roomName, remainingShuffeledCards : suffleDeck, seletectedCardsInBoard : emptyBoard }
       roomCardReadings.push(reading)
 
-      console.log("Shuffeling ## room ", roomName); 
+      //console.log("Shuffeling ## room ", roomName); 
     }
 
     io.to(roomName).emit('remainingShuffeledCards', roomCardReadings.find(o => o.roomName == roomName));
@@ -68,13 +72,15 @@ io.on("connection", async function(socket: any) {
 
   socket.on("leaveRoom", async function(roomName: string) {
     
+    console.log("leaveRoom > ", roomName + " --- " + socket.id); 
+
     socket.leave(roomName);
-    connNicks = await SetNickToSockets(io, connNicks);
+    
     availRooms = await GetAllRooms(io, connNicks)
 
     const roomDetails = availRooms.find(o => o.roomName == roomName);
 
-    if(roomDetails)
+    if(roomDetails) 
     {
       io.to(roomName).emit('enteredRoomDetails', roomDetails);
     }
@@ -82,7 +88,7 @@ io.on("connection", async function(socket: any) {
     {
       const index = roomCardReadings.findIndex(o => o.roomName == roomName);
       roomCardReadings.splice(index)
-      console.log("roomCardReadings removed ", roomCardReadings);
+      //console.log("roomCardReadings removed ", roomCardReadings);
     }
 
   });
@@ -118,14 +124,10 @@ io.on("connection", async function(socket: any) {
     io.to(roomName).emit('remainingShuffeledCards', roomCardReadings.find(o => o.roomName == roomName));
   });
 
-
   socket.on("disconnect", async (reason: string) => {
     console.log(socket.id + " disconnetect ", reason);
     
     io.emit('message', 'desconectado ' + socket.id + ' - ' + reason);
-
-    connNicks = await SetNickToSockets(io, connNicks)
-    availRooms = await GetAllRooms(io, connNicks)
   });
 });
 
