@@ -26,19 +26,25 @@ const allCards : TarotCard[] = JSON.parse(rawdata.toString('utf-8'));
 
 io.on("connection", async function(socket: any) {
   
-  console.log("connection > ", socket.id); 
+  console.log("start connection > ", socket.id); 
   
   //return all avaible connections with nick and avatar
-  connNicks = await SetNickToSockets(io, connNicks)
+  io.to(socket.id).emit('yourSockerId', socket.id);
 
-  const temp = connNicks.find(o => o.id == socket.id)
-  io.to(socket.id).emit('socketDetails', temp);
+  socket.on("getNickAvatar", async function(socketId: string) {
+    
+    const allSockets : Array<string> = (await io.fetchSockets()).map((socket : any) => socket.id);
+
+    connNicks = await SetNickToSockets(allSockets, connNicks);
+    
+    const temp = connNicks.find(o => o.id == socket.id)
+    
+    io.to(socket.id).emit('socketDetails', temp);
+  });
 
   // whenever we receive a 'message' we log it out
   socket.on("enter-room", async function(roomName: string) {
     
-    console.log("enter-room > ", roomName + " --- " + socket.id); 
-
     await socket.join(roomName);
 
     availRooms = await GetAllRooms(io, connNicks)
@@ -72,8 +78,6 @@ io.on("connection", async function(socket: any) {
 
   socket.on("leaveRoom", async function(roomName: string) {
     
-    console.log("leaveRoom > ", roomName + " --- " + socket.id); 
-
     socket.leave(roomName);
     
     availRooms = await GetAllRooms(io, connNicks)
@@ -88,7 +92,6 @@ io.on("connection", async function(socket: any) {
     {
       const index = roomCardReadings.findIndex(o => o.roomName == roomName);
       roomCardReadings.splice(index)
-      //console.log("roomCardReadings removed ", roomCardReadings);
     }
 
   });
@@ -98,7 +101,6 @@ io.on("connection", async function(socket: any) {
     if(!roomCardReadings.find(o => o.roomName == roomName))
     {
       let suffleDeck : TarotCard[] = ShuffleDeck(allCards);
-
       let reading : RoomCardReading = { roomName : roomName, roomId : roomName, remainingShuffeledCards : suffleDeck, seletectedCardsInBoard : null }
       roomCardReadings.push(reading)
     }

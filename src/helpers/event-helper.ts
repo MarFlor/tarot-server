@@ -5,9 +5,6 @@ const allNicks = JSON.parse(fs.readFileSync('src/files/nicks.json').toString('ut
 
 const GetAllRooms = (io: any, connNicks : Array<ClientSocketDetails>) : Promise<RoomDetails[]> => {
 
-  console.log("GetAllRooms connNicks", JSON.stringify(connNicks))
-  console.log("------------")
-  
   // https://simplernerd.com/js-socketio-active-rooms/
     const arr = Array.from(io.sockets.adapter.rooms)
     
@@ -33,25 +30,28 @@ const GetAllRooms = (io: any, connNicks : Array<ClientSocketDetails>) : Promise<
       
       let room : RoomDetails = { roomName : oneRoom, roomId : oneRoom, clients : clients };
       roomsTemp.push(room);
-      console.log("GetAllRooms clients roomsTemp.push", JSON.stringify(clients))
-      console.log("------------")
     }
     
-  
-    //console.log("GetAllRooms", JSON.stringify(roomsTemp))
     return Promise.resolve(roomsTemp)
 }
 
-const SetNickToSockets = async (io : any, connNicks : ClientSocketDetails[]) : Promise<ClientSocketDetails[]> => {
+const SetNickToSockets = async (currentSockets : Array<string>, connNicks : ClientSocketDetails[]) : Promise<ClientSocketDetails[]> => {
   
-    const sockets = (await io.fetchSockets()).map((socket : any) => socket.id);
+    //remove disconnected sockets
+    connNicks.map((item, index) => {
 
-    console.log("sockets", sockets);
+      if(!currentSockets.find((o: string) => o == item.id))
+      {
+        
+        //remove only one element, not all array!
+        connNicks.splice(index, 1)
+      }
+    })
 
-    //add new sockets
-    sockets.map((item : string) => {
+    //add new sockets if they are not found
+    currentSockets.map((item : string) => {
 
-      if(!connNicks.find(o => o.id == item))
+      if(!connNicks.find(o => o.id == item) || connNicks.length == 0)
       {
         const avatar = RandomAvatar();
         connNicks.push({ id :item, nick : RandomNickName(), avatar : avatar })
@@ -59,16 +59,6 @@ const SetNickToSockets = async (io : any, connNicks : ClientSocketDetails[]) : P
 
     });
     
-    //remove disconnected sockets
-    connNicks.map((item, index) => {
-
-      if(!sockets.find((o: string) => o == item.id))
-      {
-        connNicks.splice(index)
-      }
-    })
-
-    //console.log("connNicks", connNicks)
     return Promise.resolve(connNicks)
 }
 
