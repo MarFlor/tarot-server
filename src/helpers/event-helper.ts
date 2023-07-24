@@ -1,4 +1,5 @@
 import { RoomDetails } from "../types/tarot-card";
+import { Origin, Horoscope } from "circular-natal-horoscope-js";
 import fs from 'fs';
 
 const allNicks = JSON.parse(fs.readFileSync('src/files/nicks.json').toString('utf-8'));
@@ -67,7 +68,89 @@ const RandomNickName = () : string => {
     return allNicks[random];
 }
 
+const calculateZodiac = (year : number) : string => {
+
+    let sign = "";
+    
+    switch (year % 12){
+      case 0:
+        sign = 'Mono (猴), Leo ♌︎, fijo 🜔';
+        break;
+      case 1:
+        sign = 'Gallo (雞), Virgo ♍︎, Mutable ☿';
+        break;
+      case 2:
+        sign = 'Perro (狗), Libra ♎︎, Cardinal 🜍';
+        break;
+      case 3:
+        sign = 'Cerdo (豬), Escorpio ♏︎, fijo 🜔';
+        break;
+      case 4:
+        sign = 'Rata (鼠), Sagitario ♐︎, Mutable ☿' ;
+        break;
+      case 5:
+        sign = 'Búfalo (牛), Capricornio ♑︎, Cardinal 🜍';
+        break;
+      case 6:
+        sign = 'Tigre (虎), Aquario ♒︎, fijo 🜔';
+        break;
+      case 7:
+        sign = 'Liebre (兔), Piscis ♓︎, Mutable ☿';
+        break;
+      case 8:
+        sign = 'Dragón (龍), Aries ♈︎, Cardinal 🜍';
+        break;
+      case 9:
+        sign = 'Serpiente (蛇), Taurus ♉︎, fijo 🜔';
+        break;
+      case 10:
+        sign = 'Caballo (馬), Géminis ♊︎, Mutable ☿';
+        break;
+      case 11:
+        sign = 'Cabra (羊), Cancer ♋︎, Cardinal 🜍';
+        break;
+    }
+
+    return sign;
+}
+
+const calculateElement = (yearLastNumber : number) : string => {
+
+  console.log("calculateElement yearLastNumber", yearLastNumber);
+  
+  let sign = "";
+  
+  switch (yearLastNumber){
+    case 0:
+    case 1:
+      sign = 'Metal (金)';
+      break;
+    case 2:
+    case 3:
+      sign = 'Agua (水)';
+      break;
+    case 4:
+    case 5:
+      sign = 'Madera (木)';
+      break;
+    case 6:
+    case 7:
+      sign = 'Fuego (火)' ;
+      break;
+    case 8:
+    case 9:
+      sign = 'Tierra (土)';
+      break;
+  }
+
+  console.log("calculateElement", sign);
+
+  return sign;
+}
+
 const RandomAvatar = () : string => {
+  
+  /* 
   const avatars : Array<string> = 
   [
     'https://react.semantic-ui.com/images/avatar/large/jenny.jpg', 
@@ -89,6 +172,35 @@ const RandomAvatar = () : string => {
   const random = Math.floor(Math.random() * avatars.length);
 
   return avatars[random].toString();
+  */
+  return "https://flores.azurewebsites.net/img/avatar-default.png"
 }
 
-export {GetAllRooms, SetNickToSockets, RandomNickName}
+const calculateBirthChart = (year : number, month : number, date : number, hour : number, minute : number, latitude : number, longitude : number) : Horoscope => {
+
+  // December 1st, 2020 - 430pm
+  const origin = new Origin({
+    year: year,
+    month: month, // 0 = January, 11 = December!
+    date: date,
+    hour: hour,
+    minute: minute,
+    latitude: latitude,
+    longitude: longitude,
+  });
+
+  const horoscope = new Horoscope({
+    origin: origin,
+    houseSystem: "placidus", //whole-sign
+    zodiac: "tropical",
+    aspectPoints: ['bodies', 'points', 'angles'],
+    aspectWithPoints: ['bodies', 'points', 'angles'],
+    aspectTypes: ["major", "minor"],
+    customOrbs: {},
+    language: 'es'
+  });
+
+  return horoscope;
+}
+
+export {GetAllRooms, SetNickToSockets, RandomNickName, calculateZodiac, calculateElement, calculateBirthChart}

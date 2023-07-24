@@ -1,10 +1,12 @@
 import express from 'express';
 import fs from 'fs';
 import { TarotCard, RoomDetails, RoomCardReading } from './types/tarot-card';
-import { GetAllRooms, SetNickToSockets } from './helpers/event-helper';
+import { calculateBirthChart, calculateElement, calculateZodiac, GetAllRooms, SetNickToSockets } from './helpers/event-helper';
 import { ShuffleDeck } from './helpers/various';
+import cors from 'cors';
 
 const app = express();
+app.use(cors())
 let http = require("http").Server(app);
 
 const port = 8080;
@@ -137,8 +139,18 @@ app.get('/', (req, res) => {
     res.json({ Hello: 'World' });
 });
 
-app.get('/pepe', (req, res) => {
-    res.json({ answer: 42 });
+app.get('/astro', cors(), (req, res) => {
+  
+  const timestamp = +req.query.T
+  const d = new Date(timestamp);
+  const year : number = +d.getFullYear();
+  const lastNumber : number = +year.toString().at(-1)
+
+  const zodiac = calculateZodiac(year);
+  const element = calculateElement(lastNumber);
+  const birthChart = calculateBirthChart(+d.getFullYear(), +d.getMonth(), +d.getDate(), +d.getUTCHours(), +d.getMinutes(), -12.046374,  -77.042793);
+
+  res.json({ timestamp: timestamp, birthDate: d.toISOString(), zodiac: zodiac, element : element, birthChart : birthChart });
 });
 
 const server = http.listen(port, function() {
